@@ -3,7 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<title>CNC Carver</title>
+		<title>CNC GRBL Carver</title>
 		<meta name="description" content="IELTS WRITING TASK 1">
 		<style>
 			body {
@@ -72,14 +72,14 @@
 		</style>
 	</head>
 	<body>
-	<h1>CNC G-Code converter</h1>
+	<h1>GRBL G-Code converter</h1>
 	<p>Author: Herbert Alexis Caller Guzman</p>
 	<p>
 		This tool modifies the g-code exported with LaserGRBL.</br>
 		The modified g-code has additonal steps to carve wood using a z-axis ramp of 0.5mm.</br>
 		This tool does not generate optimized toolpaths.</br>
 		It will be optimized in one of the axis used to export the file.</br>
-		My usual setting is a feed rate of F3000 and a power output of S500.</br>
+		My usual setting is a feed rate of F3000 and a power output of S500 for small projects (similar to a sheet of A5 or A4 paper).</br>
 		Commonplace spindles for grbl have a maximum output of S1000.  
 	</p>
 	<p>Usage: Wood engraving, woodcut, relief printing</p>
@@ -141,7 +141,7 @@
 				if (lines[i].includes("M")) {
 					sinkAction = false;
 					newGcode = newGcode + lines[i].replace(/S\d+/g,'S0') + "\n";
-				} else if (checkFeedRate(lines[i])) {
+				} else if (checkPowerOutput(lines[i])) {
 					// test dwell code
 					newGcode = newGcode + "G0 Z0"+ "\n" + "G4 P1" + "\n";
 					sinkAction = false;
@@ -169,7 +169,7 @@
 			var x1 = parseFloat(line2.match(reX));
 			var y1 = parseFloat(line2.match(reY));
 		}
-		function checkFeedRate(line) {
+		function checkPowerOutput(line) {
 			var reX = /^S0/g;
 			var x = line.match(reX)
 			console.log(x);
