@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>CNC Carver</title>
+		<meta name="description" content="IELTS WRITING TASK 1">
+		<style>
+			body {
+				background: rgb(20, 22, 11);
+				font-family: "Consolas";
+				font-weight: 300;
+				font-size: 14px;
+				text-align: left;
+				color: rgb(209, 216, 243);
+			}
+			h1 {
+				text-align: left;
+				color: rgb(251, 251, 251);
+			}
+			h3 {
+				font-style: oblique;
+				color: rgb(86, 255, 134);
+			}
+			.framy {
+				background: rgb(24, 29, 34);
+				padding: 10px;
+				font-size: 14px;
+				margin: 10px 200px;
+				border: 2px;
+				display:inline-block;
+				text-align: left;
+			}
+			.styled4 {
+				border: 0;
+				font: "Consolas";
+				line-height: 2.5;
+				font-weight: 300;
+				padding: 5px 30px;
+				font-size: 1rem;
+				text-align: center;
+				color: #fff;
+				text-shadow: 1px 1px 1px #000;
+				border-radius: 10px;
+				background-color: rgb(47, 162, 76);
+				background-image: linear-gradient(to top left,
+												rgba(0, 0, 0, .2),
+												rgba(0, 0, 0, .2) 30%,
+												rgba(0, 0, 0, 0));
+				box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
+							inset -2px -2px 3px rgba(0, 0, 0, .6);
+			}
+
+			.styled4:hover {
+				background-color: rgb(165, 0, 220);
+			}
+
+			.styled4:active {
+				box-shadow: inset -2px -2px 3px rgba(255, 255, 255, .6),
+							inset 2px 2px 3px rgba(0, 0, 0, .6);
+			}
+			input[type="file"] {
+				display: none;
+			}
+			input[type="text"] {
+				width: 1200px;
+			}
+			div {
+				display: inline-block;
+				vertical-align: top;
+			}
+		</style>
+	</head>
+	<body>
+	<h1>CNC G-Code converter</h1>
+	<p>Author: Herbert Alexis Caller Guzman</p>
+	<p>
+		This tool modifies the g-code exported with LaserGRBL.</br>
+		The modified g-code has additonal steps to carve wood using a z-axis ramp of 0.5mm.</br>
+		This tool does not generate optimized toolpaths.</br>
+		It will be optimized in one of the axis used to export the file.</br>
+		My usual setting is a feed rate of F3000 and a power output of S500.</br>
+		Commonplace spindles for grbl have a maximum output of S1000.  
+	</p>
+	<p>Usage: Wood engraving, woodcut, relief printing</p>
+	<hr>
+	<div>
+		<h2 >G-Code exported with LaserGRBL</h2></br>
+		<textarea id="task" name="task" rows="20" cols="100"></textarea>
+		</br>
+		<button class="styled4" type="button" id="loadgcode">Convert</button>
+		<button class="styled4" type="button" id="clear">Clear</button>
+	</div>
+	<div>
+		<hr style="background-color: yellowgreen; width: 1px; height: 500px; padding: 1px; margin: 10px 50px">
+	</div>
+	<div>
+		<h2>G-Code modified for carving</h2></br>
+		<textarea id="result" name="result" rows="20" cols="100"></textarea>
+	</br>
+	<button class="styled4" type="button" id="copycode">Copy</button>
+	<!--button class="styled4" type="button" id="savecode">Save</button-->
+	<div class="styled4"><a href="" id="disk" style="color:white">Save</a></div>
+	</div>
+	<hr>
+	</body>
+	<script>
+		//var gcode;
+		var task = document.getElementById("task");
+		var result = document.getElementById("result");
+		var loadgcode = document.getElementById("loadgcode");
+		var copycode = document.getElementById("copycode");
+		//var savecode = document.getElementById("savecode");
+		var disk = document.getElementById("disk");
+		var clear = document.getElementById("clear");
+		clear.addEventListener('click', event => {
+			task.value = "";
+		});
+		//savecode.addEventListener('click', event => {});
+		loadgcode.addEventListener('click', event => {
+			var gcode = task.value;
+			console.log("Loaded!");
+			result.value = analizeLines(gcode);
+			// save file locally
+			localStorage.setItem('samplenc', result.value);
+			var file = new Blob([result.value], {type: 'text/plain'});
+			disk.href = URL.createObjectURL(file);
+			disk.download = 'sample.nc';
+		});
+		copycode.addEventListener('click', event => {
+			result.select(); 
+			document.execCommand("copy");
+			console.log("Copied!");
+		});
+		function analizeLines(gcode) {
+			var newGcode;
+			var lines = gcode.split('\n');
+			var zStep = 0.5;
+			sinkAction = false;
+			for (var i = 0; i < lines.length; i++) {
+				if (lines[i].includes("M")) {
+					sinkAction = false;
+					newGcode = newGcode + lines[i].replace(/S\d+/g,'S0') + "\n";
+				} else if (checkFeedRate(lines[i])) {
+					// test dwell code
+					newGcode = newGcode + "G0 Z0"+ "\n" + "G4 P1" + "\n";
+					sinkAction = false;
+				} else if (lines[i].includes("S")) {
+					gline = lines[i].replace(/S\d+/g,'');
+					if (sinkAction) {
+						newGcode = newGcode + gline + "\n"; 
+					} else {
+						newGcode = newGcode + gline + "S500\n" +  "G0 Z" +  zStep + "\n";
+						sinkAction = true;
+					}
+				} else if (lines[i].includes("sinks")) {
+					zStep = zStep + 0.5;
+				} else {
+					newGcode = newGcode + lines[i] + "\n";
+				}
+			}
+			return newGcode;
+		}
+		function analizeDistance(line1,line2) {
+			var reX = /X(\d+\.?\d*)/g;
+			var reY = /X(\d+\.?\d*)/g;
+			var x0 = parseFloat(line1.match(reX));
+			var y0 = parseFloat(line1.match(reY));
+			var x1 = parseFloat(line2.match(reX));
+			var y1 = parseFloat(line2.match(reY));
+		}
+		function checkFeedRate(line) {
+			var reX = /^S0/g;
+			var x = line.match(reX)
+			console.log(x);
+			if ( x != null && x[0] ===  "S0") {
+				return true;
+			}
+			return false;
+		}
+	</script>
+</html>
