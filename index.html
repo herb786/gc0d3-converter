@@ -63,7 +63,7 @@
 				display: none;
 			}
 			input[type="text"] {
-				width: 1200px;
+				width: 100px;
 			}
 			div {
 				display: inline-block;
@@ -79,13 +79,19 @@
 		The modified g-code has additonal steps to carve wood using a z-axis ramp of 0.5mm.</br>
 		This tool does not generate optimized toolpaths.</br>
 		It will be optimized in one of the axis used to export the file.</br>
-		My usual setting is a feed rate of F3000 and a power output of S500 for small projects (similar to a sheet of A5 or A4 paper).</br>
-		Commonplace spindles for grbl have a maximum output of S1000.  
+		My usual setting is a feed rate of F3000 and a speed of S500 for small projects (similar to a sheet of A5 or A4 paper).</br>
+		Commonplace spindles for grbl have a maximum speed of S1000.
 	</p>
 	<p>Usage: Wood engraving, woodcut, relief printing</p>
+	<p>
+		The deep of the groove is the number of passes times the z-axis ramp.
+	</p>
+	<hr>
+	<label for="zramp">Z-Axis ramp (mm):&emsp13;</label><input type="text" id="zramp" name="zramp" value="0.5"><br>
+	<label for="speed">Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="S500"><br>
 	<hr>
 	<div>
-		<h2 >G-Code exported with LaserGRBL</h2></br>
+		<h2 >Paste G-Code exported with LaserGRBL</h2></br>
 		<textarea id="task" name="task" rows="20" cols="100"></textarea>
 		</br>
 		<button class="styled4" type="button" id="loadgcode">Convert</button>
@@ -135,7 +141,10 @@
 		function analizeLines(gcode) {
 			var newGcode;
 			var lines = gcode.split('\n');
-			var zStep = 0.5;
+			console.log(document.getElementById("zramp").value);
+			var zStep = parseFloat(document.getElementById("zramp").value);
+			console.log(document.getElementById("speed").value);
+			var speed = document.getElementById("speed").value;
 			sinkAction = false;
 			for (var i = 0; i < lines.length; i++) {
 				if (lines[i].includes("M")) {
@@ -150,7 +159,7 @@
 					if (sinkAction) {
 						newGcode = newGcode + gline + "\n"; 
 					} else {
-						newGcode = newGcode + gline + "S500\n" +  "G0 Z" +  zStep + "\n";
+						newGcode = newGcode + gline + speed + "\n" +  "G0 Z" +  zStep + "\n";
 						sinkAction = true;
 					}
 				} else if (lines[i].includes("sinks")) {
