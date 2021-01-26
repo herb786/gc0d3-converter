@@ -74,6 +74,7 @@
 	<body>
 	<h1>GRBL G-Code converter</h1>
 	<p>Author: Herbert Alexis Caller Guzman</p>
+	<p>(Under Work, use with caution)</p>
 	<p>
 		This tool modifies the g-code exported with LaserGRBL.</br>
 		The modified g-code has additonal steps to carve wood using a z-axis ramp of 0.5mm.</br>
@@ -121,6 +122,7 @@
 		var clear = document.getElementById("clear");
 		clear.addEventListener('click', event => {
 			task.value = "";
+			result.value = "";
 		});
 		//savecode.addEventListener('click', event => {});
 		loadgcode.addEventListener('click', event => {
@@ -139,7 +141,7 @@
 			console.log("Copied!");
 		});
 		function analizeLines(gcode) {
-			var newGcode;
+			var newGcode = "";
 			var lines = gcode.split('\n');
 			console.log(document.getElementById("zramp").value);
 			var zStep = parseFloat(document.getElementById("zramp").value);
@@ -147,15 +149,19 @@
 			var speed = document.getElementById("speed").value;
 			sinkAction = false;
 			for (var i = 0; i < lines.length; i++) {
-				if (lines[i].includes("M")) {
+				console.log(lines[i]);
+				if (lines[i].includes("M3")) {
 					sinkAction = false;
 					newGcode = newGcode + lines[i].replace(/S\d+/g,'S0') + "\n";
+					//console.log("M3 detected");
 				} else if (checkPowerOutput(lines[i])) {
 					// test dwell code
 					newGcode = newGcode + "G0 Z0"+ "\n" + "G4 P1" + "\n";
 					sinkAction = false;
+					console.log("S0 detected");
 				} else if (lines[i].includes("S")) {
 					gline = lines[i].replace(/S\d+/g,'');
+					//console.log(gline);
 					if (sinkAction) {
 						newGcode = newGcode + gline + "\n"; 
 					} else {
@@ -164,6 +170,10 @@
 					}
 				} else if (lines[i].includes("sinks")) {
 					zStep = zStep + 0.5;
+				} else if (lines[i].includes("M5")) {
+					sinkAction = false;
+					newGcode = newGcode + lines[i] + "\n" + "G0 Z0"+ "\n" + "G4 P1" + "\n";
+					//console.log("M5 detected");
 				} else {
 					newGcode = newGcode + lines[i] + "\n";
 				}
