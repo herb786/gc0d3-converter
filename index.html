@@ -92,6 +92,7 @@
 	<label for="speed">Spindle Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="S500"><br>
 	<label for="power">Laser Power (S0-S1000):&emsp13;</label><input type="text" id="power" name="power" value="S200"><br>
 	<!--label for="powerth">Laser Power Threshold (S0-S1000):&emsp13;</label><input type="text" id="powerth" name="powerth" value="S20"><br-->
+	<label for="retraction">Z-Axis retraction (mm):&emsp13;</label><input type="text" id="retraction" name="retraction" value="3"><br>
 	<p>Select preferred axis</p>
 	<div>
 	<input type="radio" id="yaxis" name="axis" value="yaxis"checked>
@@ -158,6 +159,7 @@
 			var zStep = parseFloat(document.getElementById("zramp").value);
 			console.log(document.getElementById("speed").value);
 			var speed = document.getElementById("speed").value;
+			var rtct = document.getElementById("retraction").value;
 			sinkAction = false;
 			for (var i = 1; i < lines.length; i++) {
 				//console.log(lines[i]);
@@ -167,18 +169,18 @@
 					//console.log("M3 detected");
 				} else if (lines[i].includes("M5")) {
 					sinkAction = false;
-					newGcode = newGcode + lines[i] + "\n" + "G0 Z0"+ "\n" + "G4 P1" + "\n";
+					newGcode = newGcode + lines[i] + "\n" + "G0 Z-" + rtct + "\n" + "G4 P0.25" + "\n";
 					//console.log("M5 detected");
 				} else if (checkLaserOff(lines[i])) {
 					// test dwell code
-					newGcode = newGcode + "G0 Z0"+ "\n" + "G4 P1" + "\n";
+					newGcode = newGcode + "G0 Z-" + rtct + "\n" + "G4 P0.25" + "\n";
 					sinkAction = false;
 					console.log("S0 detected");
 				} else if (lines[i].includes("S")) {
 					gline = lines[i].replace(/S\d+/g,'');
 					//console.log(gline);
 					if (analizeXYDistance(lines[i], lines[i-1])) {
-						newGcode = newGcode + "G0 Z0"+ "\n" + "G4 P1" + "\n" + gline + "\n" +  "G0 Z" +  zStep + "\n";
+						newGcode = newGcode + "G0 Z-" + rtct + "\n" + "G4 P0.25" + "\n" + gline + "\n" +  "G0 Z" +  zStep + "\n";
 						sinkAction = true;
 						console.log("Laser noise detected");
 					} else if (sinkAction) {
