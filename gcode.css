@@ -1,0 +1,63 @@
+body {
+    background: rgb(20, 22, 11);
+    font-family: "Consolas";
+    font-weight: 300;
+    font-size: 14px;
+    text-align: left;
+    color: rgb(209, 216, 243);
+}
+h1 {
+    text-align: left;
+    color: rgb(251, 251, 251);
+}
+h3 {
+    font-style: oblique;
+    color: rgb(86, 255, 134);
+}
+.framy {
+    background: rgb(24, 29, 34);
+    padding: 10px;
+    font-size: 14px;
+    margin: 10px 200px;
+    border: 2px;
+    display:inline-block;
+    text-align: left;
+}
+.styled4 {
+    border: 0;
+    font: "Consolas";
+    line-height: 2.5;
+    font-weight: 300;
+    padding: 5px 30px;
+    font-size: 1rem;
+    text-align: center;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    border-radius: 10px;
+    background-color: rgb(47, 162, 76);
+    background-image: linear-gradient(to top left,
+                                    rgba(0, 0, 0, .2),
+                                    rgba(0, 0, 0, .2) 30%,
+                                    rgba(0, 0, 0, 0));
+    box-shadow: inset 2px 2px 3px rgba(255, 255, 255, .6),
+                inset -2px -2px 3px rgba(0, 0, 0, .6);
+}
+
+.styled4:hover {
+    background-color: rgb(165, 0, 220);
+}
+
+.styled4:active {
+    box-shadow: inset -2px -2px 3px rgba(255, 255, 255, .6),
+                inset 2px 2px 3px rgba(0, 0, 0, .6);
+}
+input[type="file"] {
+    display: none;
+}
+input[type="text"] {
+    width: 100px;
+}
+div {
+    display: inline-block;
+    vertical-align: top;
+}
