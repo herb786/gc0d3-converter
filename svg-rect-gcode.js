@@ -13,7 +13,9 @@ function findAndConvertRectTags(svgDoc) {
         h = Math.round(rect.getAttribute("height")*10)/10;
         //console.log(x0, y0, w, h);
         gcode = gcode + ";SVG rectangle\n"
-        if (fill === "#000000") {
+        if (ignoreStyle) {
+            gcode = simpleRect(gcode,x0,y0,w,h);
+        } else if (fill === "#000000") {
             gcode = gcodeRectFill(gcode,x0,y0,w,h);
         } else {
             gcode = gcodeRectOutline(gcode, x0, y0, w, h);
@@ -21,10 +23,19 @@ function findAndConvertRectTags(svgDoc) {
     }
     return gcode;
 }
+function simpleRect(gcode,x0,y0,w,h) {
+    gcode = retractSpindle(gcode);
+    gcode = gcode + "G0 X" + x0 + " Y" + y0 + "\n";
+    gcode = gcode + "G91\n";
+    gcode = gcode + "G1 X" + w + "\n";
+    gcode = gcode + "Y" + h + "\n";
+    gcode = gcode + "X-" + w + "\n";
+    gcode = gcode + "Y-" + h + "\n";
+    gcode = retractSpindle(gcode);
+    return gcode;
+}
 function gcodeRectOutline(gcode,x0,y0,w,h,stroke) {
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
-    gcode = gcode + "G90\n";
+    gcode = retractSpindle(gcode);
     newx0 = x0 - 0.5*stroke;
     newy0 = y0 - 0.5*stroke; 
     gcode = gcode + "G0 X" + newx0 + " Y" + newy0 + "\n";
@@ -41,14 +52,11 @@ function gcodeRectOutline(gcode,x0,y0,w,h,stroke) {
         gcode = gcode + "G1 X-" + nwidth + "\n";
         gcode = gcode + "G1 Y-" + nheight + "\n";
     }
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
+    gcode = retractSpindle(gcode);
     return gcode;
 }
 function gcodeRectFill(gcode,x0,y0,w,h) {
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
-    gcode = gcode + "G90\n";
+    gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + x0 + " Y" + y0 + "\n";
     gcode = gcode + "G91\n";
     ylength = 0;
@@ -64,7 +72,6 @@ function gcodeRectFill(gcode,x0,y0,w,h) {
         gcode = gcode + "G1 X-" + w + "\n";
         gcode = gcode + "G1 Y" + step + "\n";
     }
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
+    gcode = retractSpindle(gcode);
     return gcode;
 }

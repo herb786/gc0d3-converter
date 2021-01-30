@@ -1,7 +1,7 @@
 //var gcode;
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element
 // http://linuxcnc.org/docs/html/
-var parser, zStep, speed, rtct, step, bitd;
+var parser, zStep, speed, rtct, step, bitd, ignoreStyle, grooveHeight;
 parser = new DOMParser();
 var task = document.getElementById("task");
 var result = document.getElementById("result");
@@ -23,6 +23,7 @@ loadsvg.addEventListener('click', event => {
     rtct = parseFloat(document.getElementById("retraction").value);
     step = parseFloat(document.getElementById("step").value);
     bitd = parseFloat(document.getElementById("bitd").value);
+    ignoreStyle = document.getElementById("ignore").checked;
     console.log("Loaded!");
     // process svg
     svgDoc = parser.parseFromString(svgcode,"text/xml");
@@ -47,11 +48,10 @@ function analizeSVG(svgDoc) {
     newGcode = newGcode + findAndConvertRectTags(svgDoc);
     newGcode = newGcode + findAndConvertCircleTags(svgDoc);
     newGcode = newGcode + findAndConvertEllipseTags(svgDoc);
+    newGcode = newGcode + findAndConvertLineTags(svgDoc);
     newGcode = newGcode + "M5\n";
     newGcode = newGcode + "G0 X0 Y0 Z-5 (move back to origin)\n";
     return newGcode;
-}
-function findAndConvertLineTags(svgDoc) {
 }
 function findAndConvertPolygonTags(svgDoc) {
 }
@@ -71,5 +71,18 @@ function obtainStrokeWidth(style) {
     return stroke;
 }
 function createGroovePasses(firstPass) {
-    
+    grooveHeight = grooveHeight + zStep;
+}
+function retractSpindle(gcode){
+    gcode = gcode + "G90\n";
+    gcode = gcode + "G0 Z-" + rtct + "\n";
+    gcode = gcode + "G4 P0.25" + "\n";
+    gcode = gcode + "G90\n";
+    return gcode;
+}
+function plungeSpindle(gcode){
+    gcode = gcode + "G90\n";
+    gcode = gcode + "G0 Z" + grooveHeight + "\n";
+    gcode = gcode + "G90\n";
+    return gcode;
 }

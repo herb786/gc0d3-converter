@@ -9,6 +9,7 @@
 		<script src="svg-rect-gcode.js"></script>
 		<script src="svg-circle-gcode.js"></script>
 		<script src="svg-ellipse-gcode.js"></script>
+		<script src="svg-line-gcode.js"></script>
 	</head>
 	<body>
     <h1>SVG to G-Code converter</h1>
@@ -26,7 +27,8 @@
 	<label for="speed">Spindle Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="500"><br>
     <label for="retraction">Z-Axis retraction (mm):&emsp13;</label><input type="text" id="retraction" name="retraction" value="3"><br>
     <label for="bitd">Diameter (mm):&emsp13;</label><input type="text" id="bitd" name="bitd" value="1"><br>
-    <label for="step">Step (mm):&emsp13;</label><input type="text" id="step" name="step" value="0.5"><br>
+	<label for="step">Step (mm):&emsp13;</label><input type="text" id="step" name="step" value="0.5"><br>
+	<input type="checkbox" id="ignore" name="ignore" checked><label for="ignore"> Ignore stroke width and fill</label><br>
 	<hr>
 	<div>
 		<h2 >Paste SVG code</h2></br>

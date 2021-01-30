@@ -12,21 +12,19 @@ function findAndConvertEllipseTags(svgDoc) {
         rx = Math.round(elem.getAttribute("rx")*10)/10;
         ry = Math.round(elem.getAttribute("ry")*10)/10;
         console.log(cx, cy, rx, ry);
-        gcode = gcode + ";SVG ellipse\n"
-        if (fill === "#000000") {
+        gcode = gcode + ";SVG ellipse\n";
+        if (ignoreStyle) {
+            gcode = simpleEllipse(gcode,cx,cy,rx,ry);
+        } else if (fill === "#000000") {
             gcode = gcodeEllipseFill(gcode,cx,cy,rx,ry);
         } else {
             gcode = gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke);
-            //gcode = simpleEllipse(gcode,cx,cy,rx,ry);
         }
     }
     return gcode;
 }
-
 function simpleEllipse(gcode,cx,cy,rx,ry){
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
-    gcode = gcode + "G90\n";
+    gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + parseFloat(cx-rx).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + "\n";
     gcode = gcode + "G91\n";
     epoints = nextPoints(cx,cy,rx, ry);
@@ -35,14 +33,11 @@ function simpleEllipse(gcode,cx,cy,rx,ry){
         yp = epoints["y"][i];
         gcode = gcode + "G1 X" + parseFloat(xp).toFixed(2) + " Y" + parseFloat(yp).toFixed(2) + "\n";
     }
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
+    gcode = retractSpindle(gcode);
     return gcode;
 } 
 function gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke){
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
-    gcode = gcode + "G90\n";
+    gcode = retractSpindle(gcode);
     newx0 = cx - rx - 0.5*stroke;
     newy0 = cy;
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
@@ -61,14 +56,11 @@ function gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke){
         } 
         slength = slength + step;     
     }
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
+    gcode = retractSpindle(gcode);
     return gcode;
 }
 function gcodeEllipseFill(gcode,cx,cy,rx,ry){
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
-    gcode = gcode + "G90\n";
+    gcode = retractSpindle(gcode);
     newx0 = cx - r - 0.5*stroke;
     newy0 = cy;
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
@@ -86,8 +78,7 @@ function gcodeEllipseFill(gcode,cx,cy,rx,ry){
         } 
         slength = slength + step; 
     }
-    gcode = gcode + "G0 Z-" + rtct + "\n";
-    gcode = gcode + "G4 P0.25" + "\n";
+    gcode = retractSpindle(gcode);
     return gcode;
 }
 function nextPoints(cx,cy,a,b) {
