@@ -40,6 +40,7 @@ copycode.addEventListener('click', event => {
     console.log("Copied!");
 });
 function analizeSVG(svgDoc) {
+    console.log("Analize SVG!");
     var newGcode = "G90 (use absolute coordinates)\n";
     newGcode = newGcode + "G0 X0 Y0 Z0 F3000\n";
     newGcode = newGcode + "G0 Z-5\n";
@@ -49,40 +50,38 @@ function analizeSVG(svgDoc) {
     newGcode = newGcode + findAndConvertCircleTags(svgDoc);
     newGcode = newGcode + findAndConvertEllipseTags(svgDoc);
     newGcode = newGcode + findAndConvertLineTags(svgDoc);
+    newGcode = newGcode + findAndConvertPolylineTags(svgDoc);
+    newGcode = newGcode + findAndConvertPolygonTags(svgDoc);
+    console.log("SVG Path!");
+    newGcode = newGcode + findAndConvertPathTags(svgDoc);
     newGcode = newGcode + "M5\n";
     newGcode = newGcode + "G0 X0 Y0 Z-5 (move back to origin)\n";
     return newGcode;
-}
-function findAndConvertPolygonTags(svgDoc) {
-}
-function findAndConvertPolylineTags(svgDoc) {
-}
-function findAndConvertPathTags(svgDoc) {
-}
+};
 function obtainFillColor(style) {
     var out = style.match(/fill:(.*?);/);
     var fill = out[1];
     return fill;
-}
+};
 function obtainStrokeWidth(style) {
     var out = style.match(/stroke-width:(\d+\.?\d*)/);
     var stroke = Math.round(parseFloat(out[1])*10)/10;
     console.log(stroke);
     return stroke;
-}
+};
 function createGroovePasses(firstPass) {
     grooveHeight = grooveHeight + zStep;
-}
+};
 function retractSpindle(gcode){
     gcode = gcode + "G90\n";
     gcode = gcode + "G0 Z-" + rtct + "\n";
     gcode = gcode + "G4 P0.25" + "\n";
     gcode = gcode + "G90\n";
     return gcode;
-}
+};
 function plungeSpindle(gcode){
     gcode = gcode + "G90\n";
     gcode = gcode + "G0 Z" + grooveHeight + "\n";
     gcode = gcode + "G90\n";
     return gcode;
-}
+};
