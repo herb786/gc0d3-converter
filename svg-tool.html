@@ -13,6 +13,7 @@
 		<script src="svg-polyline-gcode.js"></script>
 		<script src="svg-polygone-gcode.js"></script>
 		<script src="svg-path-gcode.js"></script>
+		<script src="svg-path-arc-gcode.js"></script>
 	</head>
 	<body>
     <h1>SVG to G-Code converter</h1>
@@ -26,11 +27,12 @@
 	</p>
 	<hr>
     <label for="zramp">Z-Axis ramp (mm):&emsp13;</label><input type="text" id="zramp" name="zramp" value="0.5"><br>
+    <label for="depth">Z-Axis depth (mm):&emsp13;</label><input type="text" id="depth" name="depth" value="8"><br>
     <label for="feed">Feed Rate (F1000-F5000):&emsp13;</label><input type="text" id="feed" name="feed" value="3000"><br>
 	<label for="speed">Spindle Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="500"><br>
     <label for="retraction">Z-Axis retraction (mm):&emsp13;</label><input type="text" id="retraction" name="retraction" value="3"><br>
     <label for="bitd">Diameter (mm):&emsp13;</label><input type="text" id="bitd" name="bitd" value="1"><br>
-	<label for="step">Step (mm):&emsp13;</label><input type="text" id="step" name="step" value="0.5"><br>
+	<!--label for="step">Step (mm):&emsp13;</label><input type="text" id="step" name="step" value="0.5"><br-->
 	<input type="checkbox" id="ignore" name="ignore" checked><label for="ignore"> Ignore stroke width and fill</label><br>
 	<hr>
 	<div>

@@ -7,17 +7,28 @@ function findAndConvertCircleTags(svgDoc) {
         style = elem.getAttribute("style");
         stroke = obtainStrokeWidth(style);
         fill = obtainFillColor(style);
-        cy = Math.round(elem.getAttribute("cx")*10)/10;
-        cx = Math.round(elem.getAttribute("cy")*10)/10;
+        color = obtainStrokeColor(style);
+        cy = Math.round(elem.getAttribute("cy")*10)/10;
+        cx = Math.round(elem.getAttribute("cx")*10)/10;
         r = Math.round(elem.getAttribute("r")*10)/10;
         console.log(cx, cy, r);
         gcode = gcode + ";SVG circle\n";
-        if (ignoreStyle) {
-            gcode = simpleCircle(gcode,cx,cy,r);
-        } else if (fill === "#000000") {
-            gcode = gcodeCircleFill(gcode,cx,cy,r);
+        if (fill === "none") {
+            groovePasses = getGrooveStepsGrayscale(color);
         } else {
-            gcode = gcodeCircleOutline(gcode,cx,cy,r,stroke);
+            groovePasses = getGrooveStepsGrayscale(fill);
+        }
+        for (var k=0;k<groovePasses;k++) {
+            setGlobalGrooveHeight(k);
+            if (ignoreStyle) {
+                gcode = simpleCircle(gcode,cx,cy,r);
+            } else if (fill != "none") {
+                gcode = gcodeCircleFill(gcode,cx,cy,r);
+            } else if (bitd > stroke-0.5){
+                gcode = simpleCircle(gcode,cx,cy,r);
+            } else {
+                gcode = gcodeCircleOutline(gcode,cx,cy,r,stroke);
+            }
         }
     }
     return gcode;
@@ -27,6 +38,7 @@ function simpleCircle(gcode,cx,cy,r){
     gcode = gcode + "G4 P0.25" + "\n";
     gcode = gcode + "G90\n";
     gcode = gcode + "G0 X" + parseFloat(cx-r).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + "\n";
+    gcode = plungeSpindle(gcode);
     gcode = gcode + "G2 X" + parseFloat(cx-r).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + " I" + parseFloat(r).toFixed(2) + "\n";
     gcode = retractSpindle(gcode);
     return gcode;
@@ -36,6 +48,7 @@ function gcodeCircleOutline(gcode,cx,cy,r,stroke){
     newx0 = cx - r - 0.5*stroke;
     newy0 = cy;
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
+    gcode = plungeSpindle(gcode);
     slength = 0.0;
     while (slength < stroke - bitd) {
         newR = r + 0.5*stroke - slength;
@@ -54,6 +67,7 @@ function gcodeCircleFill(gcode,cx,cy,r,){
     newx0 = cx - r - 0.5*stroke;
     newy0 = cy;
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
+    gcode = plungeSpindle(gcode);
     slength = 0.0;
     while (slength < r - 0.5*bitd + 0.5*stroke) {
         newR = r + 0.5*stroke - slength;

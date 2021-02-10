@@ -2,6 +2,7 @@
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element
 // http://linuxcnc.org/docs/html/
 var parser, zStep, speed, rtct, step, bitd, ignoreStyle, grooveHeight;
+var xglobal, yglobal;
 parser = new DOMParser();
 var task = document.getElementById("task");
 var result = document.getElementById("result");
@@ -18,11 +19,13 @@ clear.addEventListener('click', event => {
 loadsvg.addEventListener('click', event => {
     var svgcode = task.value;
     // parameters
+    zDepth = parseFloat(document.getElementById("depth").value);
     zStep = parseFloat(document.getElementById("zramp").value);
     speed = parseFloat(document.getElementById("speed").value);
     rtct = parseFloat(document.getElementById("retraction").value);
-    step = parseFloat(document.getElementById("step").value);
+    //step = parseFloat(document.getElementById("step").value);
     bitd = parseFloat(document.getElementById("bitd").value);
+    step = 0.5*bitd;
     ignoreStyle = document.getElementById("ignore").checked;
     console.log("Loaded!");
     // process svg
@@ -44,7 +47,7 @@ function analizeSVG(svgDoc) {
     var newGcode = "G90 (use absolute coordinates)\n";
     newGcode = newGcode + "G0 X0 Y0 Z0 F3000\n";
     newGcode = newGcode + "G0 Z-5\n";
-    //newGcode = newGcode + "M3 S500\n";
+    newGcode = newGcode + "M3 S500\n";
     sinkAction = false;
     newGcode = newGcode + findAndConvertRectTags(svgDoc);
     newGcode = newGcode + findAndConvertCircleTags(svgDoc);
@@ -63,15 +66,30 @@ function obtainFillColor(style) {
     var fill = out[1];
     return fill;
 };
+function obtainStrokeColor(style) {
+    var out = style.match(/stroke:(.*?);/);
+    var fill = out[1];
+    return fill;
+};
 function obtainStrokeWidth(style) {
     var out = style.match(/stroke-width:(\d+\.?\d*)/);
     var stroke = Math.round(parseFloat(out[1])*10)/10;
     console.log(stroke);
     return stroke;
 };
-function createGroovePasses(firstPass) {
-    grooveHeight = grooveHeight + zStep;
-};
+function getGrooveStepsGrayscale(color) {
+    if (color=== "#000000") {
+        return parseInt(zDepth/zStep);
+    }
+    if (color=== "#4d4d4d") {
+        return parseInt(0.7*zDepth/zStep);
+    }
+    return 0;
+
+}
+function setGlobalGrooveHeight(passNumber){
+    grooveHeight = 0.5 + passNumber*zStep;
+}
 function retractSpindle(gcode){
     gcode = gcode + "G90\n";
     gcode = gcode + "G0 Z-" + rtct + "\n";
