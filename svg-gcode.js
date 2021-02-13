@@ -74,7 +74,7 @@ function obtainStrokeColor(style) {
 function obtainStrokeWidth(style) {
     var out = style.match(/stroke-width:(\d+\.?\d*)/);
     var stroke = Math.round(parseFloat(out[1])*10)/10;
-    console.log(stroke);
+    //console.log(stroke);
     return stroke;
 };
 function getGrooveStepsGrayscale(color) {

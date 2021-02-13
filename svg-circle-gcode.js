@@ -47,6 +47,7 @@ function gcodeCircleOutline(gcode,cx,cy,r,stroke){
     gcode = retractSpindle(gcode);
     newx0 = cx - r - 0.5*stroke;
     newy0 = cy;
+    console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
     gcode = plungeSpindle(gcode);
     slength = 0.0;
@@ -62,10 +63,11 @@ function gcodeCircleOutline(gcode,cx,cy,r,stroke){
     gcode = retractSpindle(gcode);;
     return gcode;
 }
-function gcodeCircleFill(gcode,cx,cy,r,){
+function gcodeCircleFill(gcode,cx,cy,r){
     gcode = retractSpindle(gcode);
     newx0 = cx - r - 0.5*stroke;
     newy0 = cy;
+    console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
     gcode = plungeSpindle(gcode);
     slength = 0.0;

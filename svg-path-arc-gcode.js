@@ -1,5 +1,7 @@
 // https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
 function computeRotatedXYStart(phi,x1,x2,y1,y2){
+    console.log("computeRotatedXYStart");
+    console.log(phi,x1,x2,y1,y2);
     var m11 = Math.cos(phi*Math.PI/180);
     var m12 = Math.sin(phi*Math.PI/180);
     var m21 = -m12;
@@ -9,17 +11,21 @@ function computeRotatedXYStart(phi,x1,x2,y1,y2){
     return {"x":x1p,"y": y1p};
 };
 function computeRotatedCenter(x1p,y1p,x1,x2,y1,y2,rx,ry,fa,fs){
+    console.log("computeRotatedCenter");
+    console.log(x1p,y1p,x1,x2,y1,y2,rx,ry,fa,fs);
     var sgn = -1;
     if (fa != fs) {
         sgn = 1;
     }
-    var numerator = rx**2*ry**2-rx**2*y1p**2-ry**2*x1p**2;
-    var denominator = rx**2*y1p**2+ry**2*x1p**2;
+    var numerator =(rx**2)*(ry**2)-(rx**2)*(y1p**2)-(ry**2)*(x1p**2);
+    var denominator = (rx**2)*(y1p**2)+(ry**2)*(x1p**2);
     var cxp = sgn*rx*y1p*Math.sqrt(numerator/denominator)/ry;
     var cyp = -1*sgn*ry*x1p*Math.sqrt(numerator/denominator)/rx;
     return {"cx":cxp, "cy":cyp};
 };
 function computeCenter(cxp, cyp, x1, y1, x2, y2, phi) {
+    console.log("computeCenter");
+    console.log(cxp, cyp, x1, y1, x2, y2, phi);
     var m11 = Math.cos(phi*Math.PI/180);
     var m12 = -Math.sin(phi*Math.PI/180);
     var m21 = -m12;
@@ -29,6 +35,8 @@ function computeCenter(cxp, cyp, x1, y1, x2, y2, phi) {
     return {"cx":cx, "cy":cy};
 };
 function computeAngleBetweenVectors(x1, y1, x2, y2) {
+    console.log("computeAngleBetweenVectors");
+    console.log(x1, y1, x2, y2);
     var dotProduct = x1*y1 + x2*y2;
     var normXY1 = Math.sqrt(x1*x1 + y1*y1);
     var normXY2 = Math.sqrt(x2*x2 + y2*y2);
@@ -37,6 +45,8 @@ function computeAngleBetweenVectors(x1, y1, x2, y2) {
     return theta;
 };
 function computeThetaAndDelta(x1p,y1p,cxp,cyp,rx,ry,fs) {
+    console.log("computeThetaAndDelta");
+    console.log(x1p,y1p,cxp,cyp,rx,ry,fs);
     var v1x = 1;
     var v1y = 0;
     var v2x = (x1p-cxp)/rx;
@@ -54,7 +64,7 @@ function computeThetaAndDelta(x1p,y1p,cxp,cyp,rx,ry,fs) {
     }
     return {"theta":theta1, "delta":delta}
 };
-function computeDrawingParameter(x1,x2,y1,y2,rx,ry,phi,fa,fs) {
+function computeDrawingParameter(x1,y1,x2,y2,rx,ry,phi,fa,fs) {
     var zp = computeRotatedXYStart(phi,x1,x2,y1,y2);
     var cp = computeRotatedCenter(zp.x,zp.y,x1,x2,y1,y2,rx,ry,fa,fs);
     var angles = computeThetaAndDelta(zp.x,zp.y,cp.cx,cp.cy,rx,ry,fs);
@@ -62,13 +72,14 @@ function computeDrawingParameter(x1,x2,y1,y2,rx,ry,phi,fa,fs) {
     var theta1 = parseFloat(angles.theta).toFixed(3);
     var cx = parseFloat(cp.cx).toFixed(3);
     var cy = parseFloat(cp.cy).toFixed(3);
-    console.log(cx,cy,theta1,delta);
+    console.log(zp,cp,cx,cy,theta1,delta);
     points = [];
     var step = delta/100;
-    console.log(step);
+    //console.log(step);
     for (var i=0; i<100; i++){
-        var x = cx + rx*Math.cos(theta1+i*step);
-        var y = cy + ry*Math.sin(theta1+i*step);
+        var ag = parseFloat(theta1)+i*step;
+        var x = parseFloat(cx) + parseFloat(rx)*Math.cos(ag);
+        var y = parseFloat(cy) + parseFloat(ry)*Math.sin(ag);
         var x1 = parseFloat(x).toFixed(3);
         var y1 = parseFloat(y).toFixed(3);
         points.push({"x":x1,"y":y1});

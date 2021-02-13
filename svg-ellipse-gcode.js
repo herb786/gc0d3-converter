@@ -1,7 +1,7 @@
 function findAndConvertEllipseTags(svgDoc) {
     var gcode = "";
     var num = svgDoc.getElementsByTagName("ellipse").length;
-    for (i=0; i < num; i++) {
+    for (var i=0; i < num; i++) {
         elem = svgDoc.getElementsByTagName("ellipse")[i];
         console.log(elem);
         style = elem.getAttribute("style");
@@ -13,12 +13,22 @@ function findAndConvertEllipseTags(svgDoc) {
         ry = Math.round(elem.getAttribute("ry")*10)/10;
         console.log(cx, cy, rx, ry);
         gcode = gcode + ";SVG ellipse\n";
-        if (ignoreStyle) {
-            gcode = simpleEllipse(gcode,cx,cy,rx,ry);
-        } else if (fill === "#000000") {
-            gcode = gcodeEllipseFill(gcode,cx,cy,rx,ry);
+        if (fill === "none") {
+            groovePasses = getGrooveStepsGrayscale(color);
         } else {
-            gcode = gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke);
+            groovePasses = getGrooveStepsGrayscale(fill);
+        }
+        for (var k=0;k<groovePasses;k++) {
+            setGlobalGrooveHeight(k);
+            if (ignoreStyle) {
+                gcode = simpleEllipse(gcode,cx,cy,rx,ry);
+            } else if (fill != "none") {
+                gcode = gcodeEllipseFill(gcode,cx,cy,rx,ry);
+            } else if (bitd > stroke-0.5){
+                gcode = simpleEllipse(gcode,cx,cy,rx,ry);
+            } else {
+                gcode = gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke);
+            }
         }
     }
     return gcode;
@@ -26,9 +36,10 @@ function findAndConvertEllipseTags(svgDoc) {
 function simpleEllipse(gcode,cx,cy,rx,ry){
     gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + parseFloat(cx-rx).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + "\n";
+    gcode = plungeSpindle(gcode);
     gcode = gcode + "G91\n";
     epoints = nextPoints(cx,cy,rx, ry);
-    for (i=0;i<epoints["x"].length;i++) {
+    for (var i=0;i<epoints["x"].length;i++) {
         xp = epoints["x"][i];
         yp = epoints["y"][i];
         gcode = gcode + "G1 X" + parseFloat(xp).toFixed(2) + " Y" + parseFloat(yp).toFixed(2) + "\n";
@@ -38,18 +49,22 @@ function simpleEllipse(gcode,cx,cy,rx,ry){
 } 
 function gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke){
     gcode = retractSpindle(gcode);
-    newx0 = cx - rx - 0.5*stroke;
+    newx0 = cx - rx - 0.5*stroke + 0.5*bitd;
     newy0 = cy;
+    console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
+    gcode = plungeSpindle(gcode);
     slength = 0.0;
     gcode = gcode + "G91\n";
     while (slength < stroke - bitd) {
         gcode = gcode + ";draw ellipse path\n"
-        newRx = rx + 0.5*stroke - slength;
+        newRx = rx + 0.5*stroke - slength - 0.5*bitd;
         newRy = ry*newRx/rx;
         epoints = nextPoints(cx,cy,newRx, newRy);
-        gcode = gcode + "G1 X" + parseFloat(step).toFixed(2) + "\n";
-        for (i=0;i<epoints["x"].length;i++) {
+        if (slength > 0) {
+            gcode = gcode + "G1 X" + parseFloat(0.5*step).toFixed(2) + "\n";
+        }
+        for (var i=0;i<epoints["x"].length;i++) {
             xp = epoints["x"][i];
             yp = epoints["y"][i];
             gcode = gcode + "G1 X" + parseFloat(xp).toFixed(2) + " Y" + parseFloat(yp).toFixed(2) + "\n";
@@ -61,22 +76,26 @@ function gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke){
 }
 function gcodeEllipseFill(gcode,cx,cy,rx,ry){
     gcode = retractSpindle(gcode);
-    newx0 = cx - r - 0.5*stroke;
+    newx0 = cx - rx - 0.5*stroke + 0.5*bitd;
     newy0 = cy;
+    console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
+    gcode = plungeSpindle(gcode);
     slength = 0.0;
     gcode = gcode + "G91\n";
-    while (slength < r - 0.5*bitd + 0.5*stroke) {
-        newRx = rx + 0.5*stroke - slength;
+    while (slength < rx - 0.5*bitd + 0.5*stroke) {
+        newRx = rx + 0.5*stroke - slength - 0.5*bitd;
         newRy = ry*newRx/rx;
         epoints = nextPoints(cx,cy,newRx, newRy);
-        gcode = gcode + "G1 X" + parseFloat(step).toFixed(2) + "\n";
-        for (i=0;i<epoints["x"].length;i++) {
+        if (slength > 0) {
+            gcode = gcode + "G1 X" + parseFloat(0.5*step).toFixed(2) + "\n";
+        }
+        for (var i=0;i<epoints["x"].length;i++) {
             xp = epoints["x"][i];
             yp = epoints["y"][i];
             gcode = gcode + "G1 X" + parseFloat(xp).toFixed(2) + " Y" + parseFloat(yp).toFixed(2) + "\n";
         } 
-        slength = slength + step; 
+        slength = slength + 0.5*step; 
     }
     gcode = retractSpindle(gcode);
     return gcode;
@@ -84,41 +103,20 @@ function gcodeEllipseFill(gcode,cx,cy,rx,ry){
 function nextPoints(cx,cy,a,b) {
     var basex = [];
     var basey = [];
-    x0 = cx - a;
-    y0 = cy;
-    y1 = 0;
-    x1 = 0;
-    while (x0 + step < cx) {
-        x1 = x0 + step;
-        dd = Math.abs(a*a*b*b - b*b*(x0-cx)*(x0-cx));     
-        y1 = cy + Math.sqrt(dd)/a;
+    var x0 = cx - a;
+    var y0 = cy;
+    var theta = 190;
+    while(theta < 360 + 181) {
+        x1 = parseFloat(cx) + parseFloat(a)*Math.cos(theta*Math.PI/180)
+        y1 = parseFloat(cy) + parseFloat(b)*Math.sin(theta*Math.PI/180)
         basex.push(x1-x0);
         basey.push(y1-y0);
+        theta = theta + 5;
         y0 = y1;
         x0 = x1;
     }
-    basex.push(cx - x1);
-    basey.push(cy + b - y1);
-    var pointx = []; 
-    var pointy = []; 
-    let pts = basex.length;
-    console.log(pts);
-    for (i=0; i<pts; i++){
-        pointx.push(basex[i]);
-        pointy.push(basey[i]);
-    };
-    for (i=0; i<pts; i++){
-        pointx.push(basex[pts-i-1]);
-        pointy.push(-basey[pts-i-1]);
-    };
-    for (i=0; i<pts; i++){
-        pointx.push(-basex[i]);
-        pointy.push(-basey[i]);
-    };
-    for (i=0; i<pts; i++){
-        pointx.push(-basex[pts-i-1]);
-        pointy.push(basey[pts-i-1]);
-    };
-    points = {"x":pointx,"y":pointy};
+    var points = {"x":basex,"y":basey};
+    //console.log(points);
     return points; 
+
 }
