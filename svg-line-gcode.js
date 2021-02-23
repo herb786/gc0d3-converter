@@ -29,8 +29,7 @@ function findAndConvertLineTags(svgDoc) {
 function simpleLine(gcode,x1,y1,x2,y2) {
     gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + x1 + " Y" + y1 + "\n";
-    gcode = plungeSpindle(gcode);
-    gcode = gcode + "G91\n";
+    gcode = plungeSpindle(gcode,"relative");
     dx = x2 - x1;
     dy = y2 - y1;
     gcode = retractSpindle(gcode);
@@ -45,8 +44,7 @@ function gcodeLineOutline(gcode,x1,y1,x2,y2,stroke) {
     stepy = step*slope;
     newy0 = y1 - 0.5*stroke*slope; 
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
-    gcode = gcode + "G91\n";
+    gcode = plungeSpindle(gcode,"relative");
     dx = x2 - x1;
     dy = y2 - y1;
     slength = 0;

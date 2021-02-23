@@ -38,7 +38,7 @@ function simpleCircle(gcode,cx,cy,r){
     gcode = gcode + "G4 P0.25" + "\n";
     gcode = gcode + "G90\n";
     gcode = gcode + "G0 X" + parseFloat(cx-r).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
+    gcode = plungeSpindle(gcode,"absolute");
     gcode = gcode + "G2 X" + parseFloat(cx-r).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + " I" + parseFloat(r).toFixed(2) + "\n";
     gcode = retractSpindle(gcode);
     return gcode;
@@ -49,7 +49,7 @@ function gcodeCircleOutline(gcode,cx,cy,r,stroke){
     newy0 = cy;
     console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
+    gcode = plungeSpindle(gcode,"aboslute");
     slength = 0.0;
     while (slength < stroke - bitd) {
         newR = r + 0.5*stroke - slength;
@@ -69,7 +69,7 @@ function gcodeCircleFill(gcode,cx,cy,r){
     newy0 = cy;
     console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
+    gcode = plungeSpindle(gcode,"absolute");
     slength = 0.0;
     while (slength < r - 0.5*bitd + 0.5*stroke) {
         newR = r + 0.5*stroke - slength;

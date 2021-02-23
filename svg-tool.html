@@ -6,6 +6,8 @@
 		<title>CNC GRBL Carver</title>
 		<meta name="description" content="GCODE">
 		<link rel="stylesheet" href="gcode.css">
+		<script src="svg-path-parsing.js"></script>
+		<script src="svg-rect-gcode.js"></script>
 		<script src="svg-rect-gcode.js"></script>
 		<script src="svg-circle-gcode.js"></script>
 		<script src="svg-ellipse-gcode.js"></script>
@@ -14,6 +16,8 @@
 		<script src="svg-polygone-gcode.js"></script>
 		<script src="svg-path-gcode.js"></script>
 		<script src="svg-path-arc-gcode.js"></script>
+		<script src="svg-path-bezier-gcode.js"></script>
+
 	</head>
 	<body>
     <h1>SVG to G-Code converter</h1>
@@ -23,11 +27,21 @@
 	<p>Author: Herbert Alexis Caller Guzman</p>
 	<p>(Work in progress, use with caution)</p>
 	<p>
-        Try to edit your svg using inkscape and verify the origin of the image.
+        Try to edit your SVG using <a href="https://inkscape.org/">Inkscape</a>.<br>This tool will only follow the profile of the components of the image.<br>
+		You should export your SVG file using Inkscape as follows:
+		<ol>
+			<li>Convert text to path.</li>
+			<li>Ungroup all the components of the SVG.</li>
+			<li>Go to <u>Preferences</u> in the menu <u>Edit</u>. <br>Then unfold <u>Input/Output</u>. <br>Select <u>SVG output</u>. <br>Unfold <u>Path data</u> and select <u>Absolute</u>.</li>
+		</ol>
+		If you wish to carve the inner of the image you could offset the profile multiple times.<br>
+		Please be aware of the dimensions and units as well as the bounding box of the image.<br> 
+		You should avoid to vectorize bitmaps for the purpose of generate gcode. <br>
+		The results for such SVG are still unpleasant. Most of the SVG available for free are vectorized bitmaps.<br>
 	</p>
 	<hr>
     <label for="zramp">Z-Axis ramp (mm):&emsp13;</label><input type="text" id="zramp" name="zramp" value="0.5"><br>
-    <label for="depth">Z-Axis depth (mm):&emsp13;</label><input type="text" id="depth" name="depth" value="8"><br>
+    <label for="depth">Z-Axis depth (mm):&emsp13;</label><input type="text" id="depth" name="depth" value="4"><br>
     <label for="feed">Feed Rate (F1000-F5000):&emsp13;</label><input type="text" id="feed" name="feed" value="3000"><br>
 	<label for="speed">Spindle Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="500"><br>
     <label for="retraction">Z-Axis retraction (mm):&emsp13;</label><input type="text" id="retraction" name="retraction" value="3"><br>
@@ -54,6 +68,13 @@
 	<div class="styled4"><a href="" id="disk" style="color:white">Save</a></div>
 	</div>
 	<hr>
+	<h2>Changelog</h2></br>
+	<ul>
+		<li>Parse SVG elements: arc, line, circle, ellipse, path, rect</li>
+		<li>Carve inner elements: circle, ellipse, rect</li>
+		<li>There exist two levels of depth. The level depends on the percentage of gray color. A 70% gray stroke will generate a depth of 70% of the specified depth.</li>
+	</ul>
+	<br><br><br>
 	</body>
 	<script src="svg-gcode.js"></script>
 </html>

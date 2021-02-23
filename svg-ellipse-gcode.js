@@ -36,8 +36,7 @@ function findAndConvertEllipseTags(svgDoc) {
 function simpleEllipse(gcode,cx,cy,rx,ry){
     gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + parseFloat(cx-rx).toFixed(2) + " Y" + parseFloat(cy).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
-    gcode = gcode + "G91\n";
+    gcode = plungeSpindle(gcode,"relative");
     epoints = nextPoints(cx,cy,rx, ry);
     for (var i=0;i<epoints["x"].length;i++) {
         xp = epoints["x"][i];
@@ -53,9 +52,8 @@ function gcodeEllipseOutline(gcode,cx,cy,rx,ry,stroke){
     newy0 = cy;
     console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
+    gcode = plungeSpindle(gcode,"relative");
     slength = 0.0;
-    gcode = gcode + "G91\n";
     while (slength < stroke - bitd) {
         gcode = gcode + ";draw ellipse path\n"
         newRx = rx + 0.5*stroke - slength - 0.5*bitd;
@@ -80,9 +78,8 @@ function gcodeEllipseFill(gcode,cx,cy,rx,ry){
     newy0 = cy;
     console.log(newx0,newy0);
     gcode = gcode + "G0 X" + parseFloat(newx0).toFixed(2) + " Y" + parseFloat(newy0).toFixed(2) + "\n";
-    gcode = plungeSpindle(gcode);
+    gcode = plungeSpindle(gcode,"relative");
     slength = 0.0;
-    gcode = gcode + "G91\n";
     while (slength < rx - 0.5*bitd + 0.5*stroke) {
         newRx = rx + 0.5*stroke - slength - 0.5*bitd;
         newRy = ry*newRx/rx;

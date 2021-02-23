@@ -21,7 +21,9 @@ function computeRotatedCenter(x1p,y1p,x1,x2,y1,y2,rx,ry,fa,fs){
     var denominator = (rx**2)*(y1p**2)+(ry**2)*(x1p**2);
     var cxp = sgn*rx*y1p*Math.sqrt(numerator/denominator)/ry;
     var cyp = -1*sgn*ry*x1p*Math.sqrt(numerator/denominator)/rx;
-    return {"cx":cxp, "cy":cyp};
+    var res = {"cx":cxp, "cy":cyp};
+    console.log(res);
+    return res;
 };
 function computeCenter(cxp, cyp, x1, y1, x2, y2, phi) {
     console.log("computeCenter");
@@ -31,13 +33,16 @@ function computeCenter(cxp, cyp, x1, y1, x2, y2, phi) {
     var m21 = -m12;
     var m22 = m11;
     var cx = m11*cxp + m12*cyp + 0.5*(x1+x2);
+    console.log(0.5*x1+x2);
     var cy = m21*cxp + m22*cyp + 0.5*(y1+y2);
-    return {"cx":cx, "cy":cy};
+    var res = {"cx":cx, "cy":cy};
+    console.log(res);
+    return res;
 };
 function computeAngleBetweenVectors(x1, y1, x2, y2) {
     console.log("computeAngleBetweenVectors");
     console.log(x1, y1, x2, y2);
-    var dotProduct = x1*y1 + x2*y2;
+    var dotProduct = x1*x2 + y1*y2;
     var normXY1 = Math.sqrt(x1*x1 + y1*y1);
     var normXY2 = Math.sqrt(x2*x2 + y2*y2);
     var sgn = Math.sign(x1*y2 - y1*x2);
@@ -67,11 +72,12 @@ function computeThetaAndDelta(x1p,y1p,cxp,cyp,rx,ry,fs) {
 function computeDrawingParameter(x1,y1,x2,y2,rx,ry,phi,fa,fs) {
     var zp = computeRotatedXYStart(phi,x1,x2,y1,y2);
     var cp = computeRotatedCenter(zp.x,zp.y,x1,x2,y1,y2,rx,ry,fa,fs);
+    var cc = computeCenter(cp.cx, cp.cy, x1, y1, x2, y2, phi);
     var angles = computeThetaAndDelta(zp.x,zp.y,cp.cx,cp.cy,rx,ry,fs);
     var delta = parseFloat(angles.delta).toFixed(3);
     var theta1 = parseFloat(angles.theta).toFixed(3);
-    var cx = parseFloat(cp.cx).toFixed(3);
-    var cy = parseFloat(cp.cy).toFixed(3);
+    var cx = parseFloat(cc.cx).toFixed(3);
+    var cy = parseFloat(cc.cy).toFixed(3);
     console.log(zp,cp,cx,cy,theta1,delta);
     points = [];
     var step = delta/100;

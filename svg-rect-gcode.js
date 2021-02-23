@@ -37,8 +37,7 @@ function findAndConvertRectTags(svgDoc) {
 function simpleRect(gcode,x0,y0,w,h) {
     gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + x0 + " Y" + y0 + "\n";
-    gcode = plungeSpindle(gcode);
-    gcode = gcode + "G91\n";
+    gcode = plungeSpindle(gcode,"relative");
     gcode = gcode + "G1 X" + w + "\n";
     gcode = gcode + "Y" + h + "\n";
     gcode = gcode + "X-" + w + "\n";
@@ -51,8 +50,7 @@ function gcodeRectOutline(gcode,x0,y0,w,h,stroke) {
     newx0 = x0 - 0.5*stroke;
     newy0 = y0 - 0.5*stroke; 
     gcode = gcode + "G0 X" + newx0 + " Y" + newy0 + "\n";
-    gcode = plungeSpindle(gcode);
-    gcode = gcode + "G91\n";
+    gcode = plungeSpindle(gcode,"relative");
     slength = 0;
     console.log(step);
     while (slength < stroke - bitd) {
@@ -71,8 +69,7 @@ function gcodeRectOutline(gcode,x0,y0,w,h,stroke) {
 function gcodeRectFill(gcode,x0,y0,w,h) {
     gcode = retractSpindle(gcode);
     gcode = gcode + "G0 X" + x0 + " Y" + y0 + "\n";
-    gcode = plungeSpindle(gcode);
-    gcode = gcode + "G91\n";
+    gcode = plungeSpindle(gcode,"relative");
     ylength = 0;
     console.log(step);
     while (ylength < h - bitd) {
