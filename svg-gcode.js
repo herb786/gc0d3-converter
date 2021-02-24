@@ -73,8 +73,32 @@ function getGrooveStepsGrayscale(color) {
     if (color=== "#000000") {
         return parseInt(zDepth/zStep);
     }
+    if (color=== "#1a1a1a") {
+        return parseInt(0.9*zDepth/zStep);
+    }
+    if (color=== "#333333") {
+        return parseInt(0.8*zDepth/zStep);
+    }
     if (color=== "#4d4d4d") {
         return parseInt(0.7*zDepth/zStep);
+    }
+    if (color=== "#666666") {
+        return parseInt(0.6*zDepth/zStep);
+    }
+    if (color=== "#808080") {
+        return parseInt(0.5*zDepth/zStep);
+    }
+    if (color=== "#999999") {
+        return parseInt(0.4*zDepth/zStep);
+    }
+    if (color=== "#b3b3b3") {
+        return parseInt(0.3*zDepth/zStep);
+    }
+    if (color=== "#cccccc") {
+        return parseInt(0.2*zDepth/zStep);
+    }
+    if (color=== "#e6e6e6") {
+        return parseInt(0.1*zDepth/zStep);
     }
     return 0;
 }

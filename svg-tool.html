@@ -40,14 +40,37 @@
 		The results for such SVG are still unpleasant. Most of the SVG available for free are vectorized bitmaps.<br>
 	</p>
 	<hr>
-    <label for="zramp">Z-Axis ramp (mm):&emsp13;</label><input type="text" id="zramp" name="zramp" value="0.5"><br>
-    <label for="depth">Z-Axis depth (mm):&emsp13;</label><input type="text" id="depth" name="depth" value="4"><br>
-    <label for="feed">Feed Rate (F1000-F5000):&emsp13;</label><input type="text" id="feed" name="feed" value="3000"><br>
-	<label for="speed">Spindle Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="500"><br>
-    <label for="retraction">Z-Axis retraction (mm):&emsp13;</label><input type="text" id="retraction" name="retraction" value="3"><br>
-    <label for="bitd">Diameter (mm):&emsp13;</label><input type="text" id="bitd" name="bitd" value="1"><br>
-	<!--label for="step">Step (mm):&emsp13;</label><input type="text" id="step" name="step" value="0.5"><br-->
-	<input type="checkbox" id="ignore" name="ignore" checked><label for="ignore"> Ignore stroke width and fill</label><br>
+	<div>
+		<div>
+			<label for="zramp">Z-Axis ramp (mm):&emsp13;</label><input type="text" id="zramp" name="zramp" value="0.5"><br>
+			<label for="depth">Z-Axis depth (mm):&emsp13;</label><input type="text" id="depth" name="depth" value="4"><br>
+			<label for="feed">Feed Rate (F1000-F5000):&emsp13;</label><input type="text" id="feed" name="feed" value="3000"><br>
+			<label for="speed">Spindle Speed (S0-S1000):&emsp13;</label><input type="text" id="speed" name="speed" value="500"><br>
+			<label for="retraction">Z-Axis retraction (mm):&emsp13;</label><input type="text" id="retraction" name="retraction" value="3"><br>
+			<label for="bitd">Diameter (mm):&emsp13;</label><input type="text" id="bitd" name="bitd" value="1"><br>
+			<!--label for="step">Step (mm):&emsp13;</label><input type="text" id="step" name="step" value="0.5"><br-->
+			<input type="checkbox" id="ignore" name="ignore" checked><label for="ignore"> Ignore stroke width and fill</label><br>
+		</div>
+		<div>
+			<table>
+				<tr>
+					<td style="background-color: #000000;">Full depth:<br>#000000</td>
+					<td style="background-color: #1a1a1a;">90% depth:<br>#1a1a1a</td>
+					<td style="background-color: #333333;">80% depth:<br>#333333</td>
+					<td style="background-color: #4d4d4d;">70% depth:<br> #4d4d4d</td>
+					<td style="background-color: #666666;">60% depth:<br> #666666</td>
+				</tr>
+				<tr>
+					<td style="background-color: #808080;">50% depth:<br> #808080</td>
+					<td style="background-color: #999999;color: black;">40% depth:<br> #999999</td>
+					<td style="background-color: #b3b3b3;color: black;">30% depth:<br> #b3b3b3</td>
+					<td style="background-color: #cccccc; color: black;">20% depth:<br> #cccccc</td>
+					<td style="background-color: #e6e6e6; color: black;">10% depth:<br> #e6e6e6</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+    
 	<hr>
 	<div>
 		<h2 >Paste SVG code</h2></br>
@@ -72,7 +95,7 @@
 	<ul>
 		<li>Parse SVG elements: arc, line, circle, ellipse, path, rect</li>
 		<li>Carve inner elements: circle, ellipse, rect</li>
-		<li>There exist two levels of depth. The level depends on the percentage of gray color. A 70% gray stroke will generate a depth of 70% of the specified depth.</li>
+		<li>There exist levels of depth. The level depends on the percentage of gray color.</li>
 	</ul>
 	<br><br><br>
 	</body>
